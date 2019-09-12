@@ -1,4 +1,4 @@
-export interface IActivity{
+export interface IActivity {
     id: string;
     title:string;
     category: string;
@@ -6,6 +6,4 @@ export interface IActivity{
     date: string;
     city:string;
     venue:string;
-
-
 }
