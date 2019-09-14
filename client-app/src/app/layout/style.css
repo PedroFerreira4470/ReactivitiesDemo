@@ -1,6 +1,18 @@
-
+* {box-sizing: border-box;}
 body {
+  margin: 0;
+  font-size: 1rem;
   background-color: rgb(234, 234, 234) !important;
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+h1, h2, strong {
+  font-weight: 700;
 }
 
 .ui.inverted.top.fixed.menu {
@@ -11,3 +23,35 @@ body {
     rgb(32, 167, 172) 89%
   ) !important;
 }
+
+
+/*home page styles*/
+
+.masthead {
+  display: flex;
+  align-items: center;
+  background-image: linear-gradient(
+          135deg,
+          rgb(24, 42, 115) 0%,
+          rgb(33, 138, 174) 69%,
+          rgb(32, 167, 172) 95%
+  ) !important;
+  height: 100vh;
+}
+
+.masthead .ui.menu .ui.button,
+.ui.menu a.ui.inverted.button {
+  margin-left: 0.5em;
+}
+
+.masthead h1.ui.header {
+  font-size: 4em;
+  font-weight: normal;
+}
+
+.masthead h2 {
+  font-size: 1.7em;
+  font-weight: normal;
+}
+
+/*end home page styles*/

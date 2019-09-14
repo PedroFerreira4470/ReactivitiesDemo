@@ -1,5 +1,5 @@
 import React, { useState, FormEvent, useContext, useEffect } from "react";
-import { Segment, Form, Button } from "semantic-ui-react";
+import { Segment, Form, Button, Grid } from "semantic-ui-react";
 import { IActivity } from "../../../app/models/activity";
 import ActivityStore from "../../../app/stores/activityStore";
 import uuid from "uuid";
@@ -50,7 +50,7 @@ const ActivityForm: React.FC<RouteComponentProps<DetailParams>> = ({match,histor
         ...activity,
         id: uuid()
       };
-      createActivity(newActivity).then(() => history.push(`/activity/${activity.id}`));
+      createActivity(newActivity).then(() => history.push(`/activity/${newActivity.id}`));
     } else {
       editActivity(activity).then(() => history.push(`/activity/${activity.id}`));
     }
@@ -64,6 +64,8 @@ const ActivityForm: React.FC<RouteComponentProps<DetailParams>> = ({match,histor
   };
 
   return (
+    <Grid>
+    <Grid.Column width={10}>
     <Segment clearing>
       <Form>
         <Form.Input
@@ -121,6 +123,8 @@ const ActivityForm: React.FC<RouteComponentProps<DetailParams>> = ({match,histor
         />
       </Form>
     </Segment>
+    </Grid.Column>
+    </Grid>
   );
 };
 
