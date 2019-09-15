@@ -78,7 +78,7 @@ class ActivityStore {
   }
 
   @action createActivity = async (activity: IActivity) => {
-    this.submiting = false;
+    this.submiting = true;
     try {
       await agent.Activities.create(activity);
       runInAction("create activity", () => {

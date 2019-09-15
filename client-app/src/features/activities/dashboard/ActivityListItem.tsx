@@ -3,6 +3,7 @@ import { Item, Button, Segment, Icon } from "semantic-ui-react";
 import { IActivity } from "../../../app/models/activity";
 import { Link } from "react-router-dom";
 import ActivityStore from "../../../app/stores/activityStore";
+import { observer } from "mobx-react-lite";
 
 interface IProps {
   activity: IActivity;
@@ -53,4 +54,4 @@ const ActivityListItem: React.FC<IProps> = ({ activity }) => {
   );
 };
 
-export default ActivityListItem;
+export default observer(ActivityListItem);
