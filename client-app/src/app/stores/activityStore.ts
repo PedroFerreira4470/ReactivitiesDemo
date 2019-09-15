@@ -2,6 +2,8 @@ import { observable, action, computed, configure, runInAction } from "mobx";
 import { createContext, SyntheticEvent } from "react";
 import { IActivity } from "../models/activity";
 import agent from "../api/agent";
+import { history } from "../..";
+import { toast } from "react-toastify";
 
 configure({ enforceActions: "always" });
 
@@ -18,11 +20,11 @@ class ActivityStore {
 
   groupActivitiesByDate(activities: IActivity[]){
     const sortedActivities = activities.sort(
-      (a, b) => Date.parse(b.date) - Date.parse(a.date)
+      (a, b) => b.date!.getTime() - a.date!.getTime()
       );
     
     return Object.entries(sortedActivities.reduce((activities, activity) => {
-      const date = activity.date.split('T')[0];
+      const date = activity.date.toISOString().split('T')[0];
       activities[date] = activities[date] ? [...activities[date],activity] : [activity];
       return activities;
     }, {} as {[key: string] : IActivity[]}));
@@ -35,7 +37,7 @@ class ActivityStore {
       const activities = await agent.Activities.list();
       runInAction("loading activities", () => {
         activities.forEach(act => {
-          act.date = act.date.split(".")[0];
+          act.date = new Date(act.date!);
           this.activityRegistry.set(act.id, act);
         });
       });
@@ -52,19 +54,24 @@ class ActivityStore {
     let activity = this.getActivity(id);
     if (activity) {
       this.activity = activity;
+      return activity;
     } else {
+      this.loadingInitial = true;
       try {
-        this.loadingInitial = true;
         const activity = await agent.Activities.detail(id);
         runInAction("get activity", () => {
+          activity.date = new Date(activity.date);
           this.activity = activity;
+          this.activityRegistry.set(activity.id, activity);
         });
+        return activity;
       } catch (error) {
         console.log(error);
-      } finally {
-        runInAction("finish geting activity", () => {
+      }finally{
+        runInAction("finished getting activity", () => {
           this.loadingInitial = false;
         });
+
       }
     }
   };
@@ -84,8 +91,10 @@ class ActivityStore {
       runInAction("create activity", () => {
         this.activityRegistry.set(activity.id, activity);
       });
+      history.push(`/activity/${activity.id}`)
     } catch (error) {
-      console.log(error);
+      toast.error("error sending data");
+      console.log(error.response);
     } finally {
       runInAction("finish creating activity", () => {
         this.submiting = false;
@@ -100,8 +109,11 @@ class ActivityStore {
       runInAction("editing activity", () => {
         this.activityRegistry.set(activity.id, activity);
         this.activity = activity;
+        history.push(`/activity/${activity.id}`)
       });
+      
     } catch (error) {
+      toast.error("error sending data");
       console.log(error);
     } finally {
       runInAction("finish editing activity", () => {

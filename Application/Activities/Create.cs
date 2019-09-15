@@ -26,7 +26,7 @@ namespace Application.Activities
         {
             public Commandvalidation()
             {
-                RuleFor(x=>x.Title).NotEmpty();
+                RuleFor(x => x.Title).NotEmpty();
                 RuleFor(x => x.Description).NotEmpty();
                 RuleFor(x => x.Category).NotEmpty();
                 RuleFor(x => x.Date).NotEmpty();
