@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Segment, Form, Button, Grid } from "semantic-ui-react";
 import { IActivityForm, ActivityFormValues } from "../../../app/models/activity";
-import ActivityStore from "../../../app/stores/activityStore";
 import { observer } from "mobx-react-lite";
 import { RouteComponentProps } from "react-router";
 import { Form as FinalForm, Field } from "react-final-form";
@@ -13,6 +12,7 @@ import DateInput from "../../../app/common/form/DateInput";
 import { combineDateAndTime } from "../../../app/common/util/util";
 import {combineValidators, isRequired,composeValidators,hasLengthGreaterThan} from "revalidate";
 import uuid from "uuid";
+import { RootStoreContext } from "../../../app/stores/rootStore";
 
 
 const validate = combineValidators({
@@ -36,9 +36,9 @@ const ActivityForm: React.FC<RouteComponentProps<DetailParams>> = ({
   match,
   history
 }) => {
-  const activityStore = useContext(ActivityStore);
+  const rootStore = useContext(RootStoreContext);
   const { id: activityId } = match.params;
-  const { submiting, loadActivity,createActivity,editActivity } = activityStore;
+  const { loadingInitial,submiting, loadActivity,createActivity,editActivity } = rootStore.activityStore;
   const [activity, setActivity] = useState<IActivityForm>(new ActivityFormValues());
 
   useEffect(() => {
@@ -75,7 +75,7 @@ const ActivityForm: React.FC<RouteComponentProps<DetailParams>> = ({
             initialValues={activity}
             onSubmit={handleFinalFormSubmit}
             render={({ handleSubmit, invalid, pristine }) => (
-              <Form onSubmit={handleSubmit} loading={activityStore.loadingInitial}>
+              <Form onSubmit={handleSubmit} loading={loadingInitial}>
                 <Field
                   name="title"
                   placeholder="Title"
@@ -126,7 +126,7 @@ const ActivityForm: React.FC<RouteComponentProps<DetailParams>> = ({
                 <Button
                   loading={submiting}
                   floated="right"
-                  disabled={activityStore.loadingInitial || invalid || pristine}
+                  disabled={loadingInitial || invalid || pristine}
                   positive
                   type="submit"
                   content="Submit"
@@ -137,7 +137,7 @@ const ActivityForm: React.FC<RouteComponentProps<DetailParams>> = ({
                       activity.id ? `/activity/${activity.id}` : "/activities"
                     )
                   }
-                  disabled={activityStore.loadingInitial}
+                  disabled={loadingInitial}
                   floated="right"
                   type="button"
                   content="Cancel"

@@ -2,16 +2,16 @@ import React, { useContext } from "react";
 import { Item, Button, Segment, Icon } from "semantic-ui-react";
 import { IActivity } from "../../../app/models/activity";
 import { Link } from "react-router-dom";
-import ActivityStore from "../../../app/stores/activityStore";
 import { observer } from "mobx-react-lite";
 import {format} from 'date-fns';
+import { RootStoreContext } from "../../../app/stores/rootStore";
 
 interface IProps {
   activity: IActivity;
 }
 const ActivityListItem: React.FC<IProps> = ({ activity }) => {
-  const activityStore = useContext(ActivityStore);
-  const { deleteActivity, target, submiting } = activityStore;
+  const rootStore = useContext(RootStoreContext);
+  const { deleteActivity, target, submiting } = rootStore.activityStore;
 
   return (
     <Segment.Group>
