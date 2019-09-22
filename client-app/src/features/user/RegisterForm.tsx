@@ -12,7 +12,7 @@ const validate = combineValidators({
   email: isRequired("email"),
   password: isRequired("password"),
   displayName: isRequired("displayName"),
-  username: isRequired("username")
+  userName: isRequired("userName")
 });
 
 const RegisterForm = () => {
@@ -41,7 +41,7 @@ const RegisterForm = () => {
             color="teal"
             textAlign="center"
           ></Header>
-          <Field name="username" component={TextInput} placeholder="Username" />
+          <Field name="userName" component={TextInput} placeholder="Username" />
           <Field name="displayName" component={TextInput} placeholder="Name" />
           <Field name="email" component={TextInput} placeholder="Email" />
           <Field

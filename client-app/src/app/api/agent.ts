@@ -6,14 +6,16 @@ import { toast } from "react-toastify";
 
 axios.defaults.baseURL = "http://localhost:5000/api/";
 
-axios.interceptors.request.use((config) => {
-    const token = window.localStorage.getItem('jwt');
-    console.log(token);
+axios.interceptors.request.use(
+  config => {
+    const token = window.localStorage.getItem("jwt");
     if (token) config.headers.Authorization = `Bearer ${token}`;
-    return config
-  }, error => {
+    return config;
+  },
+  error => {
     return Promise.reject(error);
-  })
+  }
+);
 
 axios.interceptors.response.use(undefined, error => {
   const { status, data, config } = error.response;
@@ -69,9 +71,10 @@ const Activities = {
   list: (): Promise<IActivity[]> => request.get("/activities"),
   detail: (id: string) => request.get(`/activities/${id}`),
   create: (activity: IActivity) => request.post("/activities", activity),
-  update: (activity: IActivity) =>
-    request.put(`/activities/${activity.id}`, activity),
-  delete: (id: string) => request.del(`/activities/${id}`)
+  update: (activity: IActivity) => request.put(`/activities/${activity.id}`, activity),
+  delete: (id: string) => request.del(`/activities/${id}`),
+  attend: (id: string) => request.post(`/activities/${id}/attend`, {}),
+  unattend: (id: string) => request.del(`/activities/${id}/attend`)
 };
 
 const User = {

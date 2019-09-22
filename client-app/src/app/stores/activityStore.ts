@@ -1,15 +1,15 @@
 import { observable, action, computed, runInAction } from "mobx";
-import {  SyntheticEvent } from "react";
+import { SyntheticEvent } from "react";
 import { IActivity } from "../models/activity";
 import agent from "../api/agent";
 import { history } from "../..";
 import { toast } from "react-toastify";
 import { RootStore } from "./rootStore";
-
+import { setActivityProps, createAttendee,createAttendeeHasHost } from "../common/util/util";
 
 export default class ActivityStore {
   rootStore: RootStore;
-  constructor(rootStore: RootStore){
+  constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
   }
 
@@ -18,22 +18,31 @@ export default class ActivityStore {
   @observable loadingInitial = false;
   @observable submiting = false;
   @observable target = "";
+  @observable loading = false;
 
   @computed get activitiesByDate() {
-    return this.groupActivitiesByDate(Array.from(this.activityRegistry.values()));
+    return this.groupActivitiesByDate(
+      Array.from(this.activityRegistry.values())
+    );
   }
 
-  groupActivitiesByDate(activities: IActivity[]){
+  groupActivitiesByDate(activities: IActivity[]) {
     const sortedActivities = activities.sort(
       (a, b) => b.date!.getTime() - a.date!.getTime()
-      );
-    
-    return Object.entries(sortedActivities.reduce((activities, activity) => {
-      const date = activity.date.toISOString().split('T')[0];
-      activities[date] = activities[date] ? [...activities[date],activity] : [activity];
-      return activities;
-    }, {} as {[key: string] : IActivity[]}));
+    );
 
+    return Object.entries(
+      sortedActivities.reduce(
+        (activities, activity) => {
+          const date = activity.date.toISOString().split("T")[0];
+          activities[date] = activities[date]
+            ? [...activities[date], activity]
+            : [activity];
+          return activities;
+        },
+        {} as { [key: string]: IActivity[] }
+      )
+    );
   }
 
   @action loadActivities = async () => {
@@ -42,7 +51,7 @@ export default class ActivityStore {
       const activities = await agent.Activities.list();
       runInAction("loading activities", () => {
         activities.forEach(act => {
-          act.date = new Date(act.date!);
+          setActivityProps(act, this.rootStore.userStore.user!);
           this.activityRegistry.set(act.id, act);
         });
       });
@@ -65,18 +74,17 @@ export default class ActivityStore {
       try {
         const activity = await agent.Activities.detail(id);
         runInAction("get activity", () => {
-          activity.date = new Date(activity.date);
+          setActivityProps(activity, this.rootStore.userStore.user!);
           this.activity = activity;
           this.activityRegistry.set(activity.id, activity);
         });
         return activity;
       } catch (error) {
         console.log(error);
-      }finally{
+      } finally {
         runInAction("finished getting activity", () => {
           this.loadingInitial = false;
         });
-
       }
     }
   };
@@ -93,10 +101,13 @@ export default class ActivityStore {
     this.submiting = true;
     try {
       await agent.Activities.create(activity);
+      const attendee = createAttendeeHasHost(this.rootStore.userStore.user!);
+      activity.attendees = [attendee];
+      activity.isHost = true;
       runInAction("create activity", () => {
         this.activityRegistry.set(activity.id, activity);
       });
-      history.push(`/activity/${activity.id}`)
+      history.push(`/activity/${activity.id}`);
     } catch (error) {
       toast.error("error sending data");
       console.log(error.response);
@@ -114,9 +125,8 @@ export default class ActivityStore {
       runInAction("editing activity", () => {
         this.activityRegistry.set(activity.id, activity);
         this.activity = activity;
-        history.push(`/activity/${activity.id}`)
+        history.push(`/activity/${activity.id}`);
       });
-      
     } catch (error) {
       toast.error("error sending data");
       console.log(error);
@@ -148,7 +158,47 @@ export default class ActivityStore {
     }
   };
 
+  @action attendActivity = async () => {
+    const attendee = createAttendee(this.rootStore.userStore.user!);
+    this.loading = true;
+    try {
+      await agent.Activities.attend(this.activity!.id);
+      runInAction(() => {
+        if (this.activity) {
+          this.activity.attendees.push(attendee);
+          this.activity.isGoing = true;
+          this.activityRegistry.set(this.activity.id, this.activity);
+        }
+      });
+    } catch (error) {
+      toast.error("Problem signing up to activity");
+    } finally {
+      runInAction(() => {
+        this.loading = false;
+      });
+    }
+  };
 
+  @action cancelAttendance = async () => {
+    const user = this.rootStore.userStore.user!;
+    this.loading = true;
+    try {
+      await agent.Activities.unattend(this.activity!.id);
+      runInAction(() => {
+        if (this.activity) {
+          this.activity.attendees = this.activity.attendees.filter(
+            a => a.userName !== user.userName
+          );
+          this.activity.isGoing = false;
+          this.activityRegistry.set(this.activity.id, this.activity);
+        }
+      });
+    } catch (error) {
+      toast.error("Problem cancelling up attendence");
+    } finally {
+      runInAction(() => {
+        this.loading = false;
+      });
+    }
+  };
 }
-
-//export default createContext(new ActivityStore());
