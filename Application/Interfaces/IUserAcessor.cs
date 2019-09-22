@@ -6,6 +6,7 @@ namespace Application.Interfaces
 {
     public interface IUserAcessor
     {
+        string GetCurrentEmail();
         string GetCurrentUserName();
     }
 }
