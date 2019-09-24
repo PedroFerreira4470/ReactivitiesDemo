@@ -40,7 +40,7 @@ namespace Application.Activities
                 var user = await context.Users.FirstOrDefaultAsync(u => u.UserName == userAcessor.GetCurrentUserName());
 
                 if (user == null) /*Not really needed*/
-                    throw new RestException(HttpStatusCode.NotFound, new { user = "User not found" });
+                    throw new RestException(HttpStatusCode.NotFound, new { user = "UserDTO not found" });
 
                 var attendance = await context.UserActivities
                     .FirstOrDefaultAsync(a =>

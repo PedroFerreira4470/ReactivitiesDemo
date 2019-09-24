@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Persistence;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -15,12 +16,12 @@ namespace Application.User
 {
     public class CurrentUser
     {
-        public class Query : IRequest<User>
+        public class Query : IRequest<UserDTO>
         {
             
         }
 
-        public class Handler : IRequestHandler<Query, User>
+        public class Handler : IRequestHandler<Query, UserDTO>
         {
             private readonly UserManager<AppUser> userManager;
             private readonly IJwtGenerator jwt;
@@ -32,7 +33,7 @@ namespace Application.User
                 this.jwt = jwt;
                 this.userAcessor = userAcessor;
             }
-            public async Task<User> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<UserDTO> Handle(Query request, CancellationToken cancellationToken)
             {
 
                 var user = await userManager.FindByNameAsync(userAcessor.GetCurrentUserName());
@@ -40,12 +41,12 @@ namespace Application.User
                 if (user == null)
                     throw new RestException(HttpStatusCode.NotFound, new { Activity = "Not Found" });
 
-                return new User
+                return new UserDTO
                 {
                     DisplayName = user.DisplayName,
                     UserName = user.UserName,
                     Token = jwt.CreateToken(user),
-                    Image = null,
+                    Image = user.Photos?.FirstOrDefault(x => x.IsMain)?.Url,
                 };
             }
         }

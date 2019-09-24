@@ -20,7 +20,7 @@ namespace Application.User
     public class Register
     {
 
-        public class Command : IRequest<User>
+        public class Command : IRequest<UserDTO>
         {
             public string DisplayName { get; set; }
             public string UserName { get; set; }
@@ -41,7 +41,7 @@ namespace Application.User
             }
         }
 
-        public class Handler : IRequestHandler<Command,User>
+        public class Handler : IRequestHandler<Command,UserDTO>
         {
             private readonly DataContext context;
             private readonly IJwtGenerator jwt;
@@ -54,7 +54,7 @@ namespace Application.User
 
             }
 
-            public async Task<User> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<UserDTO> Handle(Command request, CancellationToken cancellationToken)
             {
                 if (await context.Users.Where(p => p.Email == request.Email).AnyAsync())
                     throw new RestException(HttpStatusCode.BadRequest,"Email Already Exist");
@@ -71,11 +71,11 @@ namespace Application.User
                 var result = await userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
-                    return new User {
+                    return new UserDTO {
                         DisplayName = request.DisplayName,
                         UserName = request.UserName,
                         Token = jwt.CreateToken(user),
-                        Image = null,
+                        Image = user.Photos?.FirstOrDefault(x => x.IsMain)?.Url,
                     };
                 }
                 throw new Exception("Problem creating user");

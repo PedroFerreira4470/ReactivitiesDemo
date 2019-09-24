@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Persistence;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -17,7 +18,7 @@ namespace Application.User
     public class Login
     {
 
-          public class Query : IRequest<User> {
+          public class Query : IRequest<UserDTO> {
             public string Email { get; set; }
             public string Password { get; set; }
 
@@ -30,7 +31,7 @@ namespace Application.User
                 RuleFor(x => x.Password).NotEmpty();
             }
         }
-        public class Handler : IRequestHandler<Query, User>
+        public class Handler : IRequestHandler<Query, UserDTO>
         {
             private readonly UserManager<AppUser> UserManager;
             private readonly SignInManager<AppUser> SignInManager;
@@ -45,7 +46,7 @@ namespace Application.User
 
             
 
-            public async Task<User> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<UserDTO> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await UserManager.FindByEmailAsync(request.Email);
 
@@ -59,11 +60,11 @@ namespace Application.User
                 if (result.Succeeded)
                 {
                     //generate Token
-                    return new User {
+                    return new UserDTO {
                         DisplayName = user.DisplayName,
                         Token= JwtGenerator.CreateToken(user),
                         UserName =user.UserName,
-                        Image=null,
+                        Image=user.Photos?.FirstOrDefault(x=>x.IsMain)?.Url,
                     };
                 }
                 throw new RestException(HttpStatusCode.Unauthorized);
