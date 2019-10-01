@@ -2,9 +2,6 @@
 using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -16,7 +13,7 @@ namespace API.Controllers
             return await Mediator.Send(command);
         }
 
-        [HttpDelete("{Id}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<Unit>> Delete(string id)
         {
             return await Mediator.Send(new Delete.Command {Id = id });;

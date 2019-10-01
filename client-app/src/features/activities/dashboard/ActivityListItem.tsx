@@ -11,7 +11,7 @@ interface IProps {
   activity: IActivity;
 }
 const ActivityListItem: React.FC<IProps> = ({ activity }) => {
-  const host = activity.attendees.filter(x=>x.isHost)[0];
+  const host = activity.attendees.filter(x => x.isHost)[0];
   const rootStore = useContext(RootStoreContext);
   const { deleteActivity, target, submiting } = rootStore.activityStore;
   //console.log("going: "+activity.isGoing + " host:"+activity.isHost);
@@ -20,10 +20,20 @@ const ActivityListItem: React.FC<IProps> = ({ activity }) => {
       <Segment>
         <Item.Group>
           <Item>
-            <Item.Image size="tiny" circular src={host.image || "/assets/user.png"} />
+            <Item.Image
+              size="tiny"
+              circular
+              src={host.image || "/assets/user.png"}
+              style={{ marginBottom: 10 }}
+            />
             <Item.Content>
-              <Item.Header as={Link} to={`/activity/${activity.id}`}>{activity.title}</Item.Header>
-              <Item.Description>Hosted By {host.displayName}</Item.Description>
+              <Item.Header as={Link} to={`/activity/${activity.id}`}>
+                {activity.title}
+              </Item.Header>
+              <Item.Description>
+                Hosted By 
+                <Link to={`profile/${host.userName}`}> {host.displayName}</Link>
+              </Item.Description>
               {activity.isHost && (
                 <Item.Description>
                   <Label
@@ -33,8 +43,8 @@ const ActivityListItem: React.FC<IProps> = ({ activity }) => {
                   />
                 </Item.Description>
               )}
-              
-              { activity.isGoing && !activity.isHost && (
+
+              {activity.isGoing && !activity.isHost && (
                 <Item.Description>
                   <Label
                     color="green"
