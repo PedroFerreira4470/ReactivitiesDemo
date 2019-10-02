@@ -9,6 +9,7 @@ export interface IProfile {
 
 }
 
+
 export interface IPhoto {
     id: string,
     url:string,

@@ -13,6 +13,7 @@ export default class ProfileStore {
     @observable profile: IProfile | null = null;
     @observable loadingProfile = true;
     @observable uploadingPhoto = false;
+    @observable uploadingProfile = false;
     @observable loading = false;
     
     @computed get isCurrentUser(){
@@ -35,6 +36,26 @@ export default class ProfileStore {
         }finally{
             runInAction(()=>{
                 this.loadingProfile= false;
+            })
+        }
+    }
+
+    @action updateProfile = async (profile: Partial<IProfile>) => {
+        try{
+             this.uploadingProfile = true;
+             await agent.Profiles.updateProfile(profile);
+            runInAction(()=>{
+                if(profile.displayName !== this.rootStore.userStore.user!.displayName){
+                    this.rootStore.userStore.user!.displayName = profile.displayName!;
+                }
+                this.profile= {...this.profile!,...profile};
+            })
+        }catch(error){
+            console.log(error);
+            toast.error("Problem changing profile");
+        }finally{
+            runInAction(()=>{
+                this.uploadingProfile = false;
             })
         }
     }
@@ -81,6 +102,8 @@ export default class ProfileStore {
             })
         }
     }
+
+
 
     
     @action deletePhoto = async (photo: IPhoto) => {
