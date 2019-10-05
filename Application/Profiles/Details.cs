@@ -21,19 +21,15 @@ namespace Application.Profiles
         
         public class Handler : IRequestHandler<Query, ProfileDTO>
         {
-            private readonly DataContext context;
-            private readonly IMapper mapper;
+            private readonly IProfileReader profileReader;
 
-            public Handler(DataContext context , IMapper mapper)
+            public Handler(IProfileReader profileReader)
             {
-                this.context = context;
-                this.mapper = mapper;
+                this.profileReader = profileReader;
             }
             public async Task<ProfileDTO> Handle(Query request, CancellationToken cancellationToken)
             {
-                var user = await context.Users.FirstOrDefaultAsync(x => x.UserName == request.UserName);
-
-                return mapper.Map<AppUser, ProfileDTO>(user);
+                return await profileReader.ReadProfile(request.UserName);
             }
         }
     }

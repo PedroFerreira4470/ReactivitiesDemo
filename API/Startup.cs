@@ -22,6 +22,7 @@ using AutoMapper;
 using Infrastructure.Photos;
 using API.SignalR;
 using System.Threading.Tasks;
+using Application.Profiles;
 
 namespace API
 {
@@ -97,6 +98,7 @@ namespace API
 
             services.AddScoped<IJwtGenerator, JwsGenerator>();
             services.AddScoped<IUserAcessor, UserAcessor>();
+            services.AddScoped<IProfileReader, ProfileReader>();
             services.AddScoped<IPhotoAcessor, PhotoAcessor>();
             services.Configure<CloudinarySettings>(Configuration.GetSection("Cloudinary"));
         }

@@ -66,13 +66,14 @@ const request = {
       .delete(url)
       .then(sleep(1000))
       .then(responseBody),
-  postForm: (url: string,file:Blob) =>{
+  postForm: (url: string, file: Blob) => {
     let formData = new FormData();
-    formData.append("File",file);
-    return axios.post(url,formData, {
-      headers:{'Content-type':'multipart/form-data'}
-    }).then(responseBody)
-
+    formData.append("File", file);
+    return axios
+      .post(url, formData, {
+        headers: { "Content-type": "multipart/form-data" }
+      })
+      .then(responseBody);
   }
 };
 
@@ -100,9 +101,15 @@ const Profiles = {
     request.get(`/profiles/${userName}`),
   uploadPhoto: (photo: Blob): Promise<IPhoto> =>
     request.postForm("/photos", photo),
-  setMainPhoto: (id: string) => request.post(`/Photos/${id}/setmain`,{}),
+  setMainPhoto: (id: string) => request.post(`/Photos/${id}/setmain`, {}),
   deletePhoto: (id: string) => request.del(`/Photos/${id}`),
-  updateProfile:(profile: Partial<IProfile>) => request.put(`/profiles`,profile),
+  updateProfile: (profile: Partial<IProfile>) =>
+    request.put(`/profiles`, profile),
+  follow: (userName: string) =>
+    request.post(`/profiles/${userName}/follow`, {}),
+  unfollow: (userName: string) => request.del(`/profiles/${userName}/follow`),
+  listFollowings: (userName: string, predicate: string) =>
+    request.get(`/profiles/${userName}/follow?predicate=${predicate}`)
 };
 
 export default {

@@ -1,26 +1,26 @@
 import { runInAction } from "mobx";
 
 export interface IActivity {
-    id: string;
-    title:string;
-    category: string;
-    description:string;
-    date: Date;
-    city:string;
-    venue:string;
-    isGoing:boolean;
-    isHost:boolean;
-    attendees: IAttendee[];
-    comments: IComment[];
+    id: string,
+    title:string,
+    category: string,
+    description:string,
+    date: Date,
+    city:string,
+    venue:string,
+    isGoing:boolean,
+    isHost:boolean,
+    attendees: IAttendee[],
+    comments: IComment[],
 }
 
 export interface IComment {
-    id: string;
-    createAt: Date;
-    body: string;
-    userName: string;
-    displayName: string;
-    image: string;
+    id: string,
+    createAt: Date,
+    body: string,
+    userName: string,
+    displayName: string,
+    image: string,
 }
 
 export interface IActivityForm extends Partial<IActivity> {
@@ -47,8 +47,9 @@ export class ActivityFormValues implements IActivityForm{
 }
 
 export interface IAttendee {
-    userName: string;
-    displayName: string;
-    image: string;
-    isHost: boolean;
+    userName: string,
+    displayName: string,
+    image: string,
+    isHost: boolean,
+    following?: boolean,
 }
