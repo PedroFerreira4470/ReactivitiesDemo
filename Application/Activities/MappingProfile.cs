@@ -11,7 +11,8 @@ namespace Application.Activities
     {
         public MappingProfile()
         {
-            CreateMap<Activity, ActivityDTO>();
+            CreateMap<Activity, ActivityDTO>()
+                .ForMember(destination => destination.Date, option => option.MapFrom(source => source.Date.ToLocalTime()));
             CreateMap<UserActivity, AttendeeDTO>()
                 .ForMember(destination => destination.UserName, option => option.MapFrom(source => source.AppUser.UserName))
                 .ForMember(destination => destination.DisplayName, option => option.MapFrom(source => source.AppUser.DisplayName))

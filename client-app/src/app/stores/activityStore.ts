@@ -5,8 +5,12 @@ import agent from "../api/agent";
 import { history } from "../..";
 import { toast } from "react-toastify";
 import { RootStore } from "./rootStore";
-import { setActivityProps, createAttendee,createAttendeeHasHost } from "../common/util/util";
-
+import {
+  setActivityProps,
+  createAttendee,
+  createAttendeeHasHost
+} from "../common/util/util";
+import { HubConnection, HubConnectionBuilder, LogLevel } from "@aspnet/signalr";
 export default class ActivityStore {
   rootStore: RootStore;
   constructor(rootStore: RootStore) {
@@ -19,6 +23,41 @@ export default class ActivityStore {
   @observable submiting = false;
   @observable target = "";
   @observable loading = false;
+  @observable.ref HubConnection: HubConnection | null = null;
+
+  @action createHubConnection = () => {
+    this.HubConnection = new HubConnectionBuilder()
+      .withUrl("http://localhost:5000/chat", {
+        accessTokenFactory: () => this.rootStore.commonStore.token!
+      })
+      .configureLogging(LogLevel.Information)
+      .build();
+
+    this.HubConnection.start()
+      .then(() => console.log(this.HubConnection!.state))
+      .catch(error => console.log("Error establising connection:", error));
+
+      this.HubConnection.on("Receive Comment", comment => {
+        runInAction(()=>{
+          console.log(comment);
+           this.activity!.comments.push(comment);
+        })
+       
+      })
+  };
+
+  @action stopHubConnection = () => {
+    this.HubConnection!.stop();
+  }
+
+  @action addComment = async (values: any) => {
+    values.ActivityId = this.activity!.id;
+    try{
+      await this.HubConnection!.invoke('SendComment',values);
+    }catch(error){
+      console.log(error);
+    }
+  }
 
   @computed get activitiesByDate() {
     return this.groupActivitiesByDate(
@@ -103,6 +142,7 @@ export default class ActivityStore {
       await agent.Activities.create(activity);
       const attendee = createAttendeeHasHost(this.rootStore.userStore.user!);
       activity.attendees = [attendee];
+      activity.comments=[];
       activity.isHost = true;
       runInAction("create activity", () => {
         this.activityRegistry.set(activity.id, activity);

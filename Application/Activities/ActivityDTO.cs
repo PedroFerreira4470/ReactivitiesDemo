@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Application.Comments;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,5 +18,7 @@ namespace Application.Activities
 
         [JsonProperty("attendees")]
         public ICollection<AttendeeDTO> UserActivities { get; set; }
+
+        public ICollection<CommentDTO> Comments { get; set; }
     }
 }
