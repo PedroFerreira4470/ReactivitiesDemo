@@ -30,7 +30,6 @@ namespace Application.Activities
             }
             public async Task<ActivityDTO> Handle(Query request, CancellationToken cancellationToken)
             {
-
                 var activity = await context.Activities
                     .FindAsync(request.Id);
 

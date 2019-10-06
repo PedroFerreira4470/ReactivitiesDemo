@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { IActivity } from "../models/activity";
+import { IActivity, IActivitiesEnvelope } from "../models/activity";
 import { IUserFormValues, IUser } from "../models/user";
 import { history } from "../..";
 import { toast } from "react-toastify";
@@ -40,31 +40,22 @@ axios.interceptors.response.use(undefined, error => {
 
 const responseBody = (response: AxiosResponse) => response.data;
 
-const sleep = (ms: number) => (response: AxiosResponse) =>
-  new Promise<AxiosResponse>(resolve =>
-    setTimeout(() => resolve(response), ms)
-  );
-
 const request = {
   get: (url: string) =>
     axios
       .get(url)
-      .then(sleep(1000))
       .then(responseBody),
   post: (url: string, body: {}) =>
     axios
       .post(url, body)
-      .then(sleep(1000))
       .then(responseBody),
   put: (url: string, body: {}) =>
     axios
       .put(url, body)
-      .then(sleep(1000))
       .then(responseBody),
   del: (url: string) =>
     axios
       .delete(url)
-      .then(sleep(1000))
       .then(responseBody),
   postForm: (url: string, file: Blob) => {
     let formData = new FormData();
@@ -78,7 +69,8 @@ const request = {
 };
 
 const Activities = {
-  list: (): Promise<IActivity[]> => request.get("/activities"),
+  list: (params: URLSearchParams): Promise<IActivitiesEnvelope> =>
+    axios.get('/activities',{params: params}).then(responseBody),
   detail: (id: string) => request.get(`/activities/${id}`),
   create: (activity: IActivity) => request.post("/activities", activity),
   update: (activity: IActivity) =>
@@ -109,8 +101,10 @@ const Profiles = {
     request.post(`/profiles/${userName}/follow`, {}),
   unfollow: (userName: string) => request.del(`/profiles/${userName}/follow`),
   listFollowings: (userName: string, predicate: string) =>
-    request.get(`/profiles/${userName}/follow?predicate=${predicate}`)
-};
+    request.get(`/profiles/${userName}/follow?predicate=${predicate}`),
+  listActivities: (userName:string, predicate: string) => 
+    request.get(`/profiles/${userName}/activities?predicate=${predicate}`)
+  };
 
 export default {
   Activities,
