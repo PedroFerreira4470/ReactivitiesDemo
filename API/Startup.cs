@@ -23,6 +23,7 @@ using Infrastructure.Photos;
 using API.SignalR;
 using System.Threading.Tasks;
 using Application.Profiles;
+using System;
 
 namespace API
 {
@@ -45,7 +46,11 @@ namespace API
             });
             services.AddCors(opt => {
                 opt.AddPolicy("CorsPolicy", policy =>{
-                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000").AllowCredentials();
+                    policy.AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .WithExposedHeaders("WWW-Authenticate")
+                          .WithOrigins("http://localhost:3000")
+                          .AllowCredentials();
                 });
             });
             services.AddMediatR(typeof(List.Handler).Assembly);
@@ -79,7 +84,9 @@ namespace API
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = key,
                         ValidateAudience = false,
-                        ValidateIssuer = false
+                        ValidateIssuer = false,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero,
                     };
                     opt.Events = new JwtBearerEvents
                     {
@@ -116,11 +123,18 @@ namespace API
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 //app.UseHsts();
             }
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseAuthentication();
             app.UseCors("CorsPolicy");
             app.UseSignalR(routes => { routes.MapHub<ChatHub>("/chat"); });
             //app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseMvc(routes => {
+                routes.MapSpaFallbackRoute(
+                    name: "spa-fallback",
+                    defaults: new { controller = "Fallback", action = "Index" }
+                    );
+            });
         }
     }
 }

@@ -5,7 +5,7 @@ import { history } from "../..";
 import { toast } from "react-toastify";
 import { IProfile, IPhoto } from "../models/profile";
 
-axios.defaults.baseURL = "http://localhost:5000/api/";
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 axios.interceptors.request.use(
   config => {
@@ -19,10 +19,15 @@ axios.interceptors.request.use(
 );
 
 axios.interceptors.response.use(undefined, error => {
-  const { status, data, config } = error.response;
+  const { status, data, config, headers } = error.response;
 
   if (error.message === "Network Error" && !error.response) {
     toast.error("Network Error - Make sure api is running!");
+  }
+  if(status === 401 && headers['www-authenticate'] === 'Bearer error="invalid_token", error_description="The token is expired"' ){
+    window.localStorage.removeItem('jwt');
+    history.push("/");
+    toast.info("Your session has experied please login again!")
   }
   if (
     status === 404 ||

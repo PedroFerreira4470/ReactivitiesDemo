@@ -73,6 +73,7 @@ const ActivityListItem: React.FC<IProps> = ({ activity }) => {
           content="View"
           color="blue"
         />
+        { activity.isHost && 
         <Button
           name={activity.id}
           onClick={e => {
@@ -83,6 +84,7 @@ const ActivityListItem: React.FC<IProps> = ({ activity }) => {
           content="Delete"
           color="red"
         />
+        }
       </Segment>
     </Segment.Group>
   );

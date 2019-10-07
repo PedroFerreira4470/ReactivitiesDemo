@@ -9,11 +9,11 @@ import ActivityForm from "../../features/activities/form/ActivityForm";
 import ActivityDetails from "../../features/activities/details/ActivityDetails";
 import NotFound from "./NotFound";
 import{ToastContainer} from 'react-toastify';
-import LoginForm from "../../features/user/LoginForm";
 import { RootStoreContext } from "../stores/rootStore";
 import LoadingComponent from "./LoadingComponent";
 import ModalContainer from "../common/modals/ModalContainer";
 import ProfilePage from "../../features/profiles/ProfilePage";
+import PrivateRoute from "./PrivateRoute";
 
 const App: React.FC<RouteComponentProps> = ({ location }) => {
   const rootStore = useContext(RootStoreContext);
@@ -43,11 +43,11 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
             <NavBar />
             <Container style={{ marginTop: "7em" }}>
               <Switch>
-                <Route exact path="/activities" component={ActivityDashboard} />
-                <Route exact path="/activity/:id" component={ActivityDetails} />~
-                <Route exact path="/login" component={LoginForm} />
-                <Route exact path="/profile/:userName" component={ProfilePage} />
-                <Route
+                <PrivateRoute exact path="/activities" component={ActivityDashboard} />
+                <PrivateRoute exact path="/activity/:id" component={ActivityDetails} />~
+                {/* <Route exact path="/login" component={LoginForm} /> */}
+                <PrivateRoute exact path="/profile/:userName" component={ProfilePage} />
+                <PrivateRoute
                   key={location.key}
                   exact
                   path={["/createActivity", "/manage/:id"]}
