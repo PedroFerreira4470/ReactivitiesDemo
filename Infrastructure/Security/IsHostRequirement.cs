@@ -28,25 +28,22 @@ namespace Infrastructure.Security
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
         IsHostRequirement requirement)
         {
-            if (context.Resource is AuthorizationFilterContext authContenxt)
-            {
-                var currentUserName = httpContextAcessor.HttpContext.User?.Claims?
-                    .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
 
-                var activityId = Guid.Parse(authContenxt.RouteData.Values["id"].ToString());
+            var currentUserName = httpContextAcessor.HttpContext.User?.Claims?
+                .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
 
-                var activity = dataContext.Activities.FindAsync(activityId).Result;
+            var activityId = Guid.Parse(httpContextAcessor.HttpContext.Request.RouteValues
+                .SingleOrDefault(x=>x.Key == "id")
+                .Value.ToString());
+            //var activityId = Guid.Parse(authContenxt.RouteData.Values["id"].ToString());
 
-                var host = activity.UserActivities.FirstOrDefault(x => x.IsHost);
+            var activity = dataContext.Activities.FindAsync(activityId).Result;
 
-                if (host?.AppUser?.UserName == currentUserName)
-                    context.Succeed(requirement);
+            var host = activity.UserActivities.FirstOrDefault(x => x.IsHost);
 
-            }
-            else
-            {
-                context.Fail();
-            }
+            if (host?.AppUser?.UserName == currentUserName)
+                context.Succeed(requirement);
+
             return Task.CompletedTask;
         }
     }

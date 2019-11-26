@@ -10,6 +10,7 @@ export default class UserStore {
     this.rootStore = rootStore;
   }
   @observable user: IUser | null = null;
+  @observable loading = false;
 
   @computed get isLoggedIn() {
     return !!this.user;
@@ -29,6 +30,23 @@ export default class UserStore {
     }
   };
 
+  @action fbLogin = async (response: any) => {
+    this.loading = true;
+    try {
+      const user = await agent.User.fbLogin(response.accessToken);
+      runInAction(() => {
+        this.user = user;
+      });
+      this.rootStore.commonStore.setToken(user.token);
+      this.rootStore.modalStore.closeModal();
+      history.push("/activities");
+    } catch (error) {
+      throw error;
+    }finally{
+      this.loading = false;
+    }
+  };
+
   @action register = async (values: IUserFormValues) => {
     try {
       const user = await agent.User.register(values);
@@ -44,21 +62,19 @@ export default class UserStore {
   };
 
   @action getUser = async () => {
-    try{
+    try {
       const user = await agent.User.current();
       runInAction(() => {
         this.user = user;
-      })
-    }catch (error){
-        console.log(error);
+      });
+    } catch (error) {
+      console.log(error);
     }
-
-  }
+  };
 
   @action logout = () => {
     this.rootStore.commonStore.setToken(null);
     this.user = null;
-    history.push('/')
-  }
-
+    history.push("/");
+  };
 }

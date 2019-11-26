@@ -1,8 +1,7 @@
 ﻿using Application.Comments;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Application.Activities
 {
@@ -16,7 +15,7 @@ namespace Application.Activities
         public string City { get; set; }
         public string Venue { get; set; }
 
-        [JsonProperty("attendees")]
+        [JsonPropertyName("attendees")]
         public ICollection<AttendeeDTO> UserActivities { get; set; }
 
         public ICollection<CommentDTO> Comments { get; set; }

@@ -32,7 +32,7 @@ namespace Infrastructure.Security
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddDays(4),
-                SigningCredentials =creds
+                SigningCredentials =creds,
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();

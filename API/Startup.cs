@@ -24,6 +24,7 @@ using API.SignalR;
 using System.Threading.Tasks;
 using Application.Profiles;
 using System;
+using Microsoft.Extensions.Hosting;
 
 namespace API
 {
@@ -71,13 +72,13 @@ namespace API
             services.AddMediatR(typeof(List.Handler).Assembly);
             services.AddAutoMapper(typeof(List.Handler));
             services.AddSignalR();
-            services.AddMvc(opt => {
+            services.AddControllers(opt => {
                 //This will give authorization to every api including the login, you have to use allowanonymous///
                 var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
                 opt.Filters.Add(new AuthorizeFilter(policy));
             })
-                .AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<Create>())
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                .AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblyContaining<Create>());
+
             var builder = services.AddIdentityCore<AppUser>();
             var identitybuilder = new IdentityBuilder(builder.UserType,builder.Services);
             identitybuilder.AddEntityFrameworkStores<DataContext>();
@@ -103,6 +104,7 @@ namespace API
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero,
                     };
+                    
                     opt.Events = new JwtBearerEvents
                     {
                         OnMessageReceived = context => {
@@ -122,11 +124,13 @@ namespace API
             services.AddScoped<IUserAcessor, UserAcessor>();
             services.AddScoped<IProfileReader, ProfileReader>();
             services.AddScoped<IPhotoAcessor, PhotoAcessor>();
+            services.AddScoped<IFacebookAccessor, FacebookAccessor>();
             services.Configure<CloudinarySettings>(Configuration.GetSection("Cloudinary"));
+            services.Configure<FacebookAppSettings>(Configuration.GetSection("Authentication:Facebook"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMiddleware<ErrorHandlingMiddleware>();
             if (env.IsDevelopment())
@@ -155,16 +159,23 @@ namespace API
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
+            app.UseRouting();
             app.UseAuthentication();
+            app.UseAuthorization();
             app.UseCors("CorsPolicy");
-            app.UseSignalR(routes => { routes.MapHub<ChatHub>("/chat"); });
-            //app.UseHttpsRedirection();
-            app.UseMvc(routes => {
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Fallback", action = "Index" }
-                    );
+            app.UseEndpoints(endpoints => {
+                endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chat");
+                endpoints.MapFallbackToController("index","Fallback");
             });
+            // app.UseSignalR(routes => { routes.MapHub<ChatHub>("/chat"); });
+            // //app.UseHttpsRedirection();
+            // app.UseMvc(routes => {
+            //     routes.MapSpaFallbackRoute(
+            //         name: "spa-fallback",
+            //         defaults: new { controller = "Fallback", action = "Index" }
+            //         );
+            // });
         }
     }
 }

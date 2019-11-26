@@ -10,11 +10,18 @@ using Microsoft.AspNetCore.Authorization;
 namespace API.Controllers
 {
    
-    public class UserController :BaseController
+    public class UserController : BaseController
     {
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<UserDTO>> Login(Login.Query query)
+        {
+            return await Mediator.Send(query);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("facebook")]
+        public async Task<ActionResult<UserDTO>> FacebookLogin(ExternalLogin.Query query)
         {
             return await Mediator.Send(query);
         }
