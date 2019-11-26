@@ -153,7 +153,7 @@ namespace API
                 .FontSources(s => s.Self().CustomSources("https://fonts.gstatic.com", "data:"))
                 .FormActions(s => s.Self())
                 .FrameAncestors(s => s.Self())
-                .ImageSources(s => s.Self().CustomSources("https://res.cloudinary.com","blob:", "data:"))
+                .ImageSources(s => s.Self().CustomSources("https://res.cloudinary.com","blob:", "data:", "https://platform-lookaside.fbsbx.com/"))
                 .ScriptSources(s => s.Self().CustomSources(
                 "sha256-EWcbgMMrMgeuxsyT4o76Gq/C5zilrLxiq6oTo2KDqus=", "https://connect.facebook.net", "sha256-tsYFq5pUcggQKFXnvmlvUrk8MgTJLL1Gjnqenv201b8="))
             );
