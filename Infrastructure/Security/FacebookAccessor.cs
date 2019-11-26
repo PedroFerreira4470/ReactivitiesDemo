@@ -17,7 +17,7 @@ namespace Infrastructure.Security
         {
             _httpClient = new HttpClient
             {
-                BaseAddress = new System.Uri("https://graph.facebook.com/")
+                BaseAddress = new Uri("https://graph.facebook.com/")
             };
             _httpClient.DefaultRequestHeaders
                 .Accept
@@ -39,7 +39,7 @@ namespace Infrastructure.Security
 
         private async Task<T> GetAsync<T>(string accessToken, string endpoint, string args)
         {
-            var response = await _httpClient.GetAsync($"{endpoint}?access_token{accessToken}&{args}");
+            var response = await _httpClient.GetAsync($"{endpoint}?access_token={accessToken}&{args}");
             if(!response.IsSuccessStatusCode)
                 return default(T);
             

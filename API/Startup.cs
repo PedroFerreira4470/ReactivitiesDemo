@@ -154,7 +154,8 @@ namespace API
                 .FormActions(s => s.Self())
                 .FrameAncestors(s => s.Self())
                 .ImageSources(s => s.Self().CustomSources("https://res.cloudinary.com","blob:", "data:"))
-                .ScriptSources(s => s.Self().CustomSources("sha256-EWcbgMMrMgeuxsyT4o76Gq/C5zilrLxiq6oTo2KDqus="))
+                .ScriptSources(s => s.Self().CustomSources(
+                "sha256-EWcbgMMrMgeuxsyT4o76Gq/C5zilrLxiq6oTo2KDqus=", "https://connect.facebook.net", "sha256-tsYFq5pUcggQKFXnvmlvUrk8MgTJLL1Gjnqenv201b8="))
             );
 
             app.UseDefaultFiles();
