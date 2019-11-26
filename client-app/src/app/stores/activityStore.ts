@@ -10,7 +10,7 @@ import {
   createAttendee,
   createAttendeeHasHost
 } from "../common/util/util";
-import { HubConnection, HubConnectionBuilder, LogLevel } from "@aspnet/signalr";
+import { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
 const LIMIT = 2;
 

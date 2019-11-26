@@ -68,7 +68,7 @@ namespace Application.User
                     Email = request.Email,
                 };
 
-                var result = await userManager.CreateAsync(user);
+                var result = await userManager.CreateAsync(user,request.Password);
                 if (result.Succeeded)
                 {
                     return new UserDTO {

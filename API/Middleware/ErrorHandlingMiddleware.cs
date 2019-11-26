@@ -4,7 +4,7 @@ using System;
 using Application.Errors;
 using System.Threading.Tasks;
 using System.Net;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace API.Middleware
 {
@@ -52,7 +52,7 @@ namespace API.Middleware
 
             if (errors != null)
             {
-                var result = JsonConvert.SerializeObject(new { errors });
+                var result = JsonSerializer.Serialize(new { errors });
 
                 await context.Response.WriteAsync(result);
             }
